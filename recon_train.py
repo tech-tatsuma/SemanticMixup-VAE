@@ -36,7 +36,6 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,)*3, (0.5,)*3),
 ])
 
-# CelebA のラベルは使わないので、target_type=None でもOK
 train_data = datasets.CelebA(root="/data/furuya", split="train",
                             target_type="attr", transform=transform, download=True)
 valid_data = datasets.CelebA(root="/data/furuya", split="valid",

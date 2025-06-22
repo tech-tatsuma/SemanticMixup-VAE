@@ -100,14 +100,20 @@ class Mixup_VAE(nn.Module):
 
     def generate_mixup(self, x1, x2, lam):
         # 1) encode
-        z1, _, _ = self.encoder(x1)
-        z2, _, _ = self.encoder(x2)
+        z1, _, _ = self.encoder(x1)   # female latent
+        z2, _, _ = self.encoder(x2)   # male latent
 
-        # 2) align (mixup_aligned を改造して partner 引数を受け取る)
-        z2_aligned = align_features(z1, z2)  # Sinkhornベースで z2 を z1 に合わせる
+        # 端点はアライメントなしで純粋に出力
+        if lam >= 0.999:
+            return self.decoder(z1)   # 100% female
+        if lam <= 0.001:
+            return self.decoder(z2)   # 100% male
+
+        # # 2) align (Sinkhorn ベース)
+        # z2_aligned = align_features(z1, z2)
 
         # 3) semantic mix
-        z_mix = lam*z1 + (1-lam)*z2_aligned
+        z_mix = lam * z1 + (1 - lam) * z2
 
         # 4) decode
         return self.decoder(z_mix)
